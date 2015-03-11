@@ -543,44 +543,60 @@
 		//ResultScene 結果画面
 		ResultScene = new createjs.Container();
 		ResultScene.visible = false;
-		var bgShape03 = new createjs.Shape();
-		bgShape03.graphics.beginFill("#CCCCCC").drawRect(0,0,_Width,_Height);
-		ResultScene.addChild(bgShape03);
+;
 	
 	};
 
 	//Complete
 	ResultSceneObject.prototype.complete = function () 
 	{
+		//画面の初期化
+		var bgShape03 = new createjs.Shape();
+		bgShape03.graphics.beginFill("#000000").drawRect(0,0,_Width,_Height);
+		ResultScene.addChild(bgShape03)
 
-		//得点
+		//GameManager.Result.maxPoint 最大獲得数
 		console.log("得点の最大" + GameManager.Result.maxPoint);
+		//GameManager.Result.point 得点
 		console.log("得点:" + GameManager.Result.point);
 
 
-		//GameManager.Result.maxPoint 最大獲得数
+		var message;
+		var messageText;
 
 		if (GameManager.Result.point == GameManager.Result.maxPoint)
 		{
-			console.log("ぱーふぇくと");
+			console.log("ぱーふぇくと!!");
+			message = "ぱーふぇくと!!";
 		}
 		//最大獲得数より2少ない
 		else if (GameManager.Result.point == GameManager.Result.maxPoint - 1)
 		{
 			console.log("べーりーぐーど！");
+			message = "べーりーぐーど！";
 		}
 		//最大獲得数の半分以上　最大獲得数より1少ない　以下
 		else if (GameManager.Result.point >= (GameManager.Result.maxPoint / 2) && GameManager.Result.point < GameManager.Result.maxPoint - 1 )
 		{
 			console.log("ぐーど！");
+			message = "ぐーど！"
 		}
 		else
 		{
-			console.log("がんばろう！");
+			console.log("ざんねん");
+			message = ("ざんねん");
 		}
 
+		//メッセージの表示
+		messageText= new createjs.Text(message, "20px Consolas", "#ffffff");
+		messageText.x = _Width / 3;
+		messageText.y = _Height / 2;
+		messageText.textAlign = "start";
+		messageText.textBaseline = "middle";
 
-
+		ResultScene.addChild(messageText);
+		
+		
 		//StartButton
 		var reStartButton  = new LeftButtonObject(rightBtnObj);
 
@@ -658,6 +674,13 @@
 	//ファイル読み込み中の処理
 	var handleProgress = function () 
 	{
+		//Loading
+		var loadingText = new createjs.Text("Now Loading...", "24px Consolas", "#ffffff");
+		loadingText.x = _Width / 4;
+		loadingText.y = _Height / 2;
+		loadingText.textAlign = "start";
+		loadingText.textBaseline = "middle";
+		stage.addChild(loadingText);
 		console.log("読み込み中");
 	};
 
@@ -665,7 +688,6 @@
 	var handleComplete = function () 
 	{
 		console.log("読み込み完了");
-		
 		//読み込み後にTitleSceneへ遷移
 		GameManager.Title();
 
