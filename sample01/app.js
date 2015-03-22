@@ -8,7 +8,10 @@
 	var _Height = 480;
 	
 	//itemの数
-	var _itemMax = 10;
+	var _ItemMax = 10;
+
+	//初期のレベル
+	var _StartLevel = 0;
 
 	//Stage
 	stage = new createjs.Stage(_Stage);
@@ -75,8 +78,8 @@
 
 			var hitTest = new createjs.Shape();
 			this._hitTest = hitTest;
-			this._hitTest.y = -32;
-			this._hitTest.graphics.beginFill(createjs.Graphics.getRGB(50, 100, 150, 0.2)).drawRect(0, 0, 32, 32);
+			this._hitTest.y = -16;
+			this._hitTest.graphics.beginFill(createjs.Graphics.getRGB(50, 100, 150, 0)).drawRect(0, 0, 32, 32);
 
 			//Player
 			this._player = new createjs.Sprite(playerSpriteSheet, "stay");
@@ -357,10 +360,11 @@
 		var itemsContainer = [];
 		var itemsPosX = [0 ,32, 64, 96, 128, 160, 192, 224, 256, 288];
 		var itemsPosY = [0 , -32, -64, -96, -128, -160, -192, -224, -256, -288];
-		//var itemsSpeed = [3 , 2, 1, 5, 2, 1, 2, 3, 2, 3];
+		var itemsSpeed = _StartLevel;
+		//var itemsSpeed = [3, 2, 1, 5, 2, 1, 2, 3, 2, 3];
 
 		//itemsの最大数
-		MainSceneCast.itemsSum = _itemMax;
+		MainSceneCast.itemsSum = _ItemMax;
 		//カウント数の初期化　itemの最大数にする
 		MainSceneCast.itemsCount = MainSceneCast.itemsSum;
 		//itemが消えた数の初期化
@@ -368,8 +372,10 @@
 		//itemを獲得した数の初期化
 		MainSceneCast.getCount = 0;
 		//結果画面の最大Pointを初期化
-		GameManager.Result.maxPoint = _itemMax;
-
+		GameManager.Result.maxPoint = _ItemMax;
+		//結果が画面の成績で難易度UP
+		//itemsSpeed = itemsSpeed + GameManager.Result.LvUpPoint;
+		console.log(GameManager.Result.LvUpPoint);
 		for (var i = 0; i< MainSceneCast.itemsSum ; i ++) {
 			var itemName = "items" + i;
 			MainSceneContainer[itemName] = itemsContainer[i];
@@ -380,6 +386,7 @@
 
 			MainSceneCast[itemName]._container.x = itemsPosX[i];
 			MainSceneCast[itemName]._container.y = itemsPosY[i];
+			MainSceneCast[itemName]._speed = MainSceneCast[itemName]._speed + itemsSpeed;
 			//MainSceneCast[itemName]._speed       = itemsSpeed[i];
 			
 			MainScene.addChild(items[i]._container);
@@ -543,7 +550,6 @@
 		//ResultScene 結果画面
 		ResultScene = new createjs.Container();
 		ResultScene.visible = false;
-;
 	
 	};
 
@@ -568,23 +574,27 @@
 		{
 			console.log("ぱーふぇくと!!");
 			message = "ぱーふぇくと!!";
+			GameManager.Result.maxPoint = 10;
 		}
 		//最大獲得数より2少ない
 		else if (GameManager.Result.point == GameManager.Result.maxPoint - 1)
 		{
 			console.log("べーりーぐーど！");
 			message = "べーりーぐーど！";
+				GameManager.Result.maxPoint = 5;
 		}
 		//最大獲得数の半分以上　最大獲得数より1少ない　以下
 		else if (GameManager.Result.point >= (GameManager.Result.maxPoint / 2) && GameManager.Result.point < GameManager.Result.maxPoint - 1 )
 		{
 			console.log("ぐーど！");
 			message = "ぐーど！"
+			GameManager.Result.maxPoint = 2;
 		}
 		else
 		{
 			console.log("ざんねん");
 			message = ("ざんねん");
+			GameManager.Result.maxPoint = 0;
 		}
 
 		//メッセージの表示
@@ -610,6 +620,7 @@
 		reStartButton._button.on('click',(function () 
 		{
 			GameManager.Main();
+
 		}));
 
 
