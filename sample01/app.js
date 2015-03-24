@@ -11,7 +11,12 @@
 	var _ItemMax = 10;
 
 	//初期のレベル
-	var _StartLevel = 0;
+	var _StartLevel = 1;
+
+	//最初のステージかどうか
+	var _FirstStage = true;
+
+
 
 	//Stage
 	stage = new createjs.Stage(_Stage);
@@ -46,6 +51,7 @@
 	//PlayerObject
 	PlayerObject = function (_container) {
 		this._container = _container;
+		this._speed = 5;
 	};
 	
 	//initialization
@@ -78,8 +84,9 @@
 
 			var hitTest = new createjs.Shape();
 			this._hitTest = hitTest;
+			this._hitTest.x = -16;
 			this._hitTest.y = -16;
-			this._hitTest.graphics.beginFill(createjs.Graphics.getRGB(50, 100, 150, 0)).drawRect(0, 0, 32, 32);
+			this._hitTest.graphics.beginFill(createjs.Graphics.getRGB(50, 100, 150, 0)).drawRect(0, 0, 64, 64);
 
 			//Player
 			this._player = new createjs.Sprite(playerSpriteSheet, "stay");
@@ -111,7 +118,7 @@
 	{
 		//this._player.gotoAndPlay("moveL");
 		//
-		this._container.x = this._container.x -5;
+		this._container.x = this._container.x - this._speed;
 
 		if (this._container.x < 0) 
 		{
@@ -125,7 +132,7 @@
 	PlayerObject.prototype.moveToRight = function ()
 	{
 		//this._player.gotoAndPlay("moveR");
-		this._container.x = this._container.x +5;
+		this._container.x = this._container.x + this._speed;
 
 		if (this._container.x > _Width - 32) 
 		{
@@ -336,7 +343,20 @@
 	//Complete
 	MainSceneObject.prototype.complete = function ()
 	{
+
+		//最初のステージの場合 
+		if(_FirstStage == true || GameManager.Result.LvUpPoint == 0)
+		{
+			GameManager.Main.StageLevel = _StartLevel;
+			_FirstStage = false;
+		}
+		else
+		{
+			GameManager.Main.StageLevel = GameManager.Main.StageLevel + GameManager.Result.LvUpPoint;
+		}
 		
+		
+
 		//背景
 		var groundImg = queue.getResult("ground");
 		var ground = new createjs.Shape();
@@ -356,11 +376,28 @@
 
 
 		//itemObject
+		
 		var items = [];
 		var itemsContainer = [];
-		var itemsPosX = [0 ,32, 64, 96, 128, 160, 192, 224, 256, 288];
-		var itemsPosY = [0 , -32, -64, -96, -128, -160, -192, -224, -256, -288];
-		var itemsSpeed = _StartLevel;
+		//Stage 1
+		//var itemsPosX = [0 ,32, 64, 96, 128, 160, 192, 224, 256, 288];
+		//var itemsPosY = [0 , -32, -64, -96, -128, -160, -192, -224, -256, -288];
+
+		//Stage2
+		//var itemsPosX = [128, 128, 128, 128, 160, 160, 160, 160, 160, 160];
+		//var itemsPosY = [0 , -32, -64, -96, -128, -160, -192, -224, -256, -288];
+
+		//Stage3
+		//var itemsPosX = [0 ,32, 64, 96, 128, 160, 192, 224, 256, 288];
+		//var itemsPosY = [-288, -256, -224, -192, -160, -128, -96, -64, -32, 0];
+
+		//Stage4
+		var itemsPosX = [0 ,32, 64, 96, 128, 160, 192, 224, 256, 0];
+		var itemsPosY = [0 , -32, -64, -96, -128, -160, -192, -224, -256, -384];
+
+
+
+		var itemsSpeed= 1;
 		//var itemsSpeed = [3, 2, 1, 5, 2, 1, 2, 3, 2, 3];
 
 		//itemsの最大数
@@ -374,12 +411,14 @@
 		//結果画面の最大Pointを初期化
 		GameManager.Result.maxPoint = _ItemMax;
 		//結果が画面の成績で難易度UP
-		//itemsSpeed = itemsSpeed + GameManager.Result.LvUpPoint;
-		console.log(GameManager.Result.LvUpPoint);
+		itemsSpeed = itemsSpeed + GameManager.Main.StageLevel;
+		
+		MainSceneCast.player._speed = MainSceneCast.player._speed + GameManager.Main.StageLevel;
+
+		console.log("GameManager.Main.StageLevel:" + GameManager.Main.StageLevel);
 		for (var i = 0; i< MainSceneCast.itemsSum ; i ++) {
 			var itemName = "items" + i;
 			MainSceneContainer[itemName] = itemsContainer[i];
-
 			items[i] = new ItemObject (itemsContainer[i]);
 			MainSceneCast[itemName] = items[i];
 			items[i].initialization ();
@@ -572,29 +611,29 @@
 
 		if (GameManager.Result.point == GameManager.Result.maxPoint)
 		{
-			console.log("ぱーふぇくと!!");
-			message = "ぱーふぇくと!!";
-			GameManager.Result.maxPoint = 10;
+			console.log("Perfect!!");
+			message = "Perfect!!";
+			GameManager.Result.LvUpPoint = 3;
 		}
 		//最大獲得数より2少ない
 		else if (GameManager.Result.point == GameManager.Result.maxPoint - 1)
 		{
-			console.log("べーりーぐーど！");
-			message = "べーりーぐーど！";
-				GameManager.Result.maxPoint = 5;
+			console.log("GOOD!!");
+			message = "GOOD!!";
+				GameManager.Result.LvUpPoint = 2;
 		}
 		//最大獲得数の半分以上　最大獲得数より1少ない　以下
 		else if (GameManager.Result.point >= (GameManager.Result.maxPoint / 2) && GameManager.Result.point < GameManager.Result.maxPoint - 1 )
 		{
-			console.log("ぐーど！");
-			message = "ぐーど！"
-			GameManager.Result.maxPoint = 2;
+			console.log("CLEAR!");
+			message = "CLEAR!"
+			GameManager.Result.LvUpPoint = 1;
 		}
 		else
 		{
-			console.log("ざんねん");
-			message = ("ざんねん");
-			GameManager.Result.maxPoint = 0;
+			console.log("GAME OVER");
+			message = ("GAME OVER");
+			GameManager.Result.LvUpPoint = 0;
 		}
 
 		//メッセージの表示
@@ -627,7 +666,10 @@
 		ResultScene.addChild(reStartButton._container);
 
 		console.log("ResultScene:" + ResultScene.numChildren);
+		
 		//console.log(stage.numChildren)
+		//console.table(MainSceneCast);
+
 
 
 		//stage.addChild(ResultScene);
@@ -681,7 +723,6 @@
 	};
 
 
-
 	//ファイル読み込み中の処理
 	var handleProgress = function () 
 	{
@@ -719,7 +760,6 @@
 			}
 		
 		//result.ticker();
-
 		//ステージの更新
 		stage.update();
 		};
