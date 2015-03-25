@@ -12,6 +12,8 @@
 
 	//初期のレベル
 	var _StartLevel = 1;
+	//最初のステージ
+	var _StartStage = 1;
 
 	//最初のステージかどうか
 	var _FirstStage = true;
@@ -344,18 +346,27 @@
 	MainSceneObject.prototype.complete = function ()
 	{
 
-		//最初のステージの場合 
-		if(_FirstStage == true || GameManager.Result.LvUpPoint == 0)
+
+
+
+		//最初のレベルの場合 
+		if(_FirstStage == true || (GameManager.Result.lvUpPoint == 0 && GameManager.Result.stageCount == 0))
 		{
-			GameManager.Main.StageLevel = _StartLevel;
+			GameManager.Main.level = _StartLevel;
+			GameManager.Main.stage = _StartStage;
+			GameManager.Result.stageCount = 0;
+			GameManager.Result.lvUpPoint = 0;
 			_FirstStage = false;
 		}
 		else
 		{
-			GameManager.Main.StageLevel = GameManager.Main.StageLevel + GameManager.Result.LvUpPoint;
+			GameManager.Main.level = GameManager.Main.level + GameManager.Result.lvUpPoint;
+			GameManager.Main.stage = GameManager.Main.stage + GameManager.Result.stageCount;
 		}
 		
 		
+		//console.log("GameManager.Main.stage" + GameManager.Main.stage);
+
 
 		//背景
 		var groundImg = queue.getResult("ground");
@@ -379,22 +390,39 @@
 		
 		var items = [];
 		var itemsContainer = [];
-		//Stage 1
-		//var itemsPosX = [0 ,32, 64, 96, 128, 160, 192, 224, 256, 288];
-		//var itemsPosY = [0 , -32, -64, -96, -128, -160, -192, -224, -256, -288];
+		var itemsX = [];
+		var itemeY = [];
 
-		//Stage2
-		//var itemsPosX = [128, 128, 128, 128, 160, 160, 160, 160, 160, 160];
-		//var itemsPosY = [0 , -32, -64, -96, -128, -160, -192, -224, -256, -288];
 
-		//Stage3
-		//var itemsPosX = [0 ,32, 64, 96, 128, 160, 192, 224, 256, 288];
-		//var itemsPosY = [-288, -256, -224, -192, -160, -128, -96, -64, -32, 0];
 
-		//Stage4
-		var itemsPosX = [0 ,32, 64, 96, 128, 160, 192, 224, 256, 0];
-		var itemsPosY = [0 , -32, -64, -96, -128, -160, -192, -224, -256, -384];
+		if (GameManager.Main.stage == 1) 
+		{
+			//Stage 1
+			itemsPosX = [0 ,32, 64, 96, 128, 160, 192, 224, 256, 288];
+			itemsPosY = [0 , -32, -64, -96, -128, -160, -192, -224, -256, -288];
 
+		}
+		else if (GameManager.Main.stage == 2)
+		{
+			//Stage2
+			itemsPosX = [128, 128, 128, 128, 160, 160, 160, 160, 160, 160];
+			itemsPosY = [0 , -32, -64, -96, -128, -160, -192, -224, -256, -288];
+
+		}
+		else if (GameManager.Main.stage == 3)
+		{
+			//Stage3
+			itemsPosX = [0 ,32, 64, 96, 128, 160, 192, 224, 256, 288];
+			itemsPosY = [-288, -256, -224, -192, -160, -128, -96, -64, -32, 0];
+
+		}
+		else if (GameManager.Main.stage == 4)
+		{
+			//Stage4
+			itemsPosX = [0 ,32, 64, 96, 128, 160, 192, 224, 256, 0];
+			itemsPosY = [0 , -32, -64, -96, -128, -160, -192, -224, -256, -554];
+
+		}
 
 
 		var itemsSpeed= 1;
@@ -411,11 +439,11 @@
 		//結果画面の最大Pointを初期化
 		GameManager.Result.maxPoint = _ItemMax;
 		//結果が画面の成績で難易度UP
-		itemsSpeed = itemsSpeed + GameManager.Main.StageLevel;
+		itemsSpeed = itemsSpeed + GameManager.Main.level;
 		
-		MainSceneCast.player._speed = MainSceneCast.player._speed + GameManager.Main.StageLevel;
+		MainSceneCast.player._speed = MainSceneCast.player._speed + GameManager.Main.level;
 
-		console.log("GameManager.Main.StageLevel:" + GameManager.Main.StageLevel);
+		console.log("GameManager.Main.level:" + GameManager.Main.level);
 		for (var i = 0; i< MainSceneCast.itemsSum ; i ++) {
 			var itemName = "items" + i;
 			MainSceneContainer[itemName] = itemsContainer[i];
@@ -609,32 +637,48 @@
 		var message;
 		var messageText;
 
+
+		//ステージクリアーの判定とメッセージ
 		if (GameManager.Result.point == GameManager.Result.maxPoint)
 		{
 			console.log("Perfect!!");
 			message = "Perfect!!";
-			GameManager.Result.LvUpPoint = 3;
+			GameManager.Result.stageCount = GameManager.Result.stageCount + 1;
+			//GameManager.Result.lvUpPoint = 3;
 		}
 		//最大獲得数より2少ない
 		else if (GameManager.Result.point == GameManager.Result.maxPoint - 1)
 		{
 			console.log("GOOD!!");
 			message = "GOOD!!";
-				GameManager.Result.LvUpPoint = 2;
+			GameManager.Result.stageCount = GameManager.Result.stageCount + 1;
+			//GameManager.Result.lvUpPoint = 2;
 		}
 		//最大獲得数の半分以上　最大獲得数より1少ない　以下
 		else if (GameManager.Result.point >= (GameManager.Result.maxPoint / 2) && GameManager.Result.point < GameManager.Result.maxPoint - 1 )
 		{
 			console.log("CLEAR!");
 			message = "CLEAR!"
-			GameManager.Result.LvUpPoint = 1;
+			GameManager.Result.stageCount = GameManager.Result.stageCount + 1;
+			//GameManager.Result.lvUpPoint = 1;
 		}
 		else
 		{
 			console.log("GAME OVER");
 			message = ("GAME OVER");
-			GameManager.Result.LvUpPoint = 0;
+			
+			GameManager.Result.stageCount = 0;
+			GameManager.Result.lvUpPoint = 0;
 		}
+
+
+		//レベルアップ
+		if (GameManager.Result.stageCount > 5)
+		{
+			GameManager.Result.stageCount = 1;
+			GameManager.Result.lvUpPoint = 2;
+		}
+
 
 		//メッセージの表示
 		messageText= new createjs.Text(message, "20px Consolas", "#ffffff");
