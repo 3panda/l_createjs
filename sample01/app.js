@@ -346,27 +346,23 @@
 	MainSceneObject.prototype.complete = function ()
 	{
 
-
-
-
 		//最初のレベルの場合 
 		if(_FirstStage == true || (GameManager.Result.lvUpPoint == 0 && GameManager.Result.stageCount == 0))
 		{
 			GameManager.Main.level = _StartLevel;
 			GameManager.Main.stage = _StartStage;
-			GameManager.Result.stageCount = 0;
-			GameManager.Result.lvUpPoint = 0;
+			GameManager.Result.stageCount = 1;
 			_FirstStage = false;
 		}
 		else
 		{
 			GameManager.Main.level = GameManager.Main.level + GameManager.Result.lvUpPoint;
-			GameManager.Main.stage = GameManager.Main.stage + GameManager.Result.stageCount;
+			GameManager.Main.stage = GameManager.Result.stageCount;
 		}
 		
-		
-		//console.log("GameManager.Main.stage" + GameManager.Main.stage);
-
+		//levelとstage
+		console.log("level:" + GameManager.Main.level + " stage:" + GameManager.Main.stage);
+		console.log("stageCount" + GameManager.Result.stageCount);
 
 		//背景
 		var groundImg = queue.getResult("ground");
@@ -385,15 +381,11 @@
 		player.initialization ();
 		MainScene.addChild(player._container);
 
-
 		//itemObject
-		
 		var items = [];
 		var itemsContainer = [];
 		var itemsX = [];
 		var itemeY = [];
-
-
 
 		if (GameManager.Main.stage == 1) 
 		{
@@ -443,7 +435,8 @@
 		
 		MainSceneCast.player._speed = MainSceneCast.player._speed + GameManager.Main.level;
 
-		console.log("GameManager.Main.level:" + GameManager.Main.level);
+		
+
 		for (var i = 0; i< MainSceneCast.itemsSum ; i ++) {
 			var itemName = "items" + i;
 			MainSceneContainer[itemName] = itemsContainer[i];
@@ -466,9 +459,9 @@
 
 		//var Jewel01 = new JewelObject (JewelContainer);
 
-		console.log(MainSceneCast);
-		console.log(MainSceneContainer);
-		console.log(MainSceneCastFlag);
+		//console.log(MainSceneCast);
+		//console.log(MainSceneContainer);
+		//console.log(MainSceneCastFlag);
 
 		//Left Button
 		var leftButton  = new LeftButtonObject(leftBtnObj);
@@ -643,7 +636,7 @@
 		{
 			console.log("Perfect!!");
 			message = "Perfect!!";
-			GameManager.Result.stageCount = GameManager.Result.stageCount + 1;
+			GameManager.Result.stageCount ++;
 			//GameManager.Result.lvUpPoint = 3;
 		}
 		//最大獲得数より2少ない
@@ -651,7 +644,7 @@
 		{
 			console.log("GOOD!!");
 			message = "GOOD!!";
-			GameManager.Result.stageCount = GameManager.Result.stageCount + 1;
+			GameManager.Result.stageCount ++;
 			//GameManager.Result.lvUpPoint = 2;
 		}
 		//最大獲得数の半分以上　最大獲得数より1少ない　以下
@@ -659,7 +652,7 @@
 		{
 			console.log("CLEAR!");
 			message = "CLEAR!"
-			GameManager.Result.stageCount = GameManager.Result.stageCount + 1;
+			GameManager.Result.stageCount ++;
 			//GameManager.Result.lvUpPoint = 1;
 		}
 		else
@@ -673,10 +666,14 @@
 
 
 		//レベルアップ
-		if (GameManager.Result.stageCount > 5)
+		if (GameManager.Result.stageCount == 5)
 		{
 			GameManager.Result.stageCount = 1;
-			GameManager.Result.lvUpPoint = 2;
+			GameManager.Result.lvUpPoint = 1;
+		}
+		else
+		{
+			GameManager.Result.lvUpPoint = 0
 		}
 
 
